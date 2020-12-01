@@ -23,6 +23,9 @@ connection.connect(function (err) {
 let currentEmployees = ["Mark", "Jon"];
 let currentRoles = ["Sales-Guy", "Boss-Mans", "Operator"];
 
+//=======
+//Prompts
+//=======
 const addEmployeePrompt = [
   { type: "input", name: "first_name", message: "What is their first name?" },
   { type: "input", name: "last_name", message: "What is their last name?" },
@@ -80,6 +83,16 @@ let removeRole = {
   choices: currentRoles,
 };
 
+
+//Displays Employees in a Table
+function queryEmployees() {
+  let query = connection.query("SELECT * FROM employee", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+  });
+  connection.end();
+}
+
 inquirer
   .prompt({
     type: "list",
@@ -101,6 +114,7 @@ inquirer
 
     //View All Employees
     if (res.decision === "View all Employees") {
+      queryEmployees();
     }
     //View all Employees by Department
     else if (res.decision === "View all Employees by Department") {
@@ -129,6 +143,4 @@ inquirer
     else if (res.decision === "Remove Role") {
       inquirer.prompt(removeRole).then((res) => {});
     }
-
-    connection.end();
   });

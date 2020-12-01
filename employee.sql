@@ -20,3 +20,5 @@ CREATE TABLE department (
  dp_name VARCHAR(30),
  PRIMARY KEY(id)
 );
+INSERT INTO employee (first_name, last_name)
+VALUES("Chris", "Lamb"),("Andrew","Lamb"),("Brandon","Rogers");
