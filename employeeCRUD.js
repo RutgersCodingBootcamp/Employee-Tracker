@@ -69,7 +69,7 @@ const addEmployeePrompt = [
 
 let removeEmployeePrompt = {
   type: "list",
-  name: "remove",
+  name: "employee",
   message: "Which employee would you like to remove?",
   choices: currentEmployees,
 };
@@ -131,7 +131,6 @@ function queryEmployees() {
       console.table(res);
     }
   );
-  connection.end();
 }
 
 //Add Employee Function
@@ -156,72 +155,125 @@ function queryAddEmployee(empFirst, empLast, role) {
 //Add Role
 function queryAddRole(empTitle, empSalary) {
   let query = connection.query(
-    "INSERT INTO role SET ?",
+    "INSERT INTO roles SET ?",
     {
       title: empTitle,
       salary: empSalary,
     },
     function (err, res) {
       if (err) throw err;
-      console.log(query1.sql);
+      console.log(query.sql);
     }
   );
   connection.end();
 }
 
-inquirer
-  .prompt({
-    type: "list",
-    name: "decision",
-    message: "What would you like to do?",
-    choices: [
-      "View all Employees",
-      "View All Employees by Department",
-      "Add Employee",
-      "Remove Employee",
-      "Update Employee Role",
-      "Update Employee Manager",
-      "Add Role",
-      "Remove Role",
-    ],
-  })
-  .then((res) => {
-    //Check For selection and Prompt user accordingly
+//Removes an Employee based on first and last name
+function queryRemoveEmployee(first, last) {
+  let query = connection.query(
+    "DELETE FROM employee WHERE first_name='" +
+      first +
+      "' AND last_name='" +
+      last +
+      "'",
+    function (err, res) {
+      if (err) throw err;
+      console.log(query.sql);
+    }
+  );
+}
+//Remove Role
+function queryRemoveRole(role) {
+  let query = connection.query(
+    "DELETE FROM roles WHERE title='" + role + "';",
+    function (err, res) {
+      if (err) throw err;
+      console.log(query.sql);
+    }
+  );
+}
 
-    //View All Employees
-    if (res.decision === "View all Employees") {
-      queryEmployees();
+//Update Employee Role
+function queryUpdateEmployeeRole(first, last, new_role) {
+  let query = connection.query(
+    "UPDATE employee SET role_id=(SELECT id FROM roles WHERE title='" +
+      new_role +
+      "')" +
+      " WHERE first_name='" +
+      first +
+      "' AND last_name='" +
+      last +
+      "';",
+    function (err, res) {
+      if (err) throw err;
     }
-    //View all Employees by Department
-    else if (res.decision === "View all Employees by Department") {
-      //Same Things as above but join role and department?
-    }
-    //Add Employee
-    else if (res.decision === "Add Employee") {
-      inquirer.prompt(addEmployeePrompt).then((res) => {
-        queryAddEmployee(res.first_name, res.last_name, res.role);
-      });
-    }
-    //Remove Employee
-    else if (res.decision === "Remove Employee") {
-      inquirer.prompt(removeEmployeePrompt).then((res) => {});
-    }
-    //Update Employee Role
-    else if (res.decision === "Update Employee Role") {
-      inquirer.prompt(updateEmployeeRole).then((res) => {});
-    }
-    //Update Employee Manager
-    else if (res.decision === "Update Employee Manager") {
-      inquirer.prompt(updateEmployeeManager).then((res) => {});
-    }
-    //Add Role
-    else if (res.decision === "Add Role") {
-      inquirer.prompt(addRole).then((res) => {
-        queryAddRole(res.title, res.salary);
-      });
-    }
-    //Remove Role
-    else if (res.decision === "Remove Role") {
-      inquirer.prompt(removeRole).then((res) => {});
-    }
-  });
+  );
+}
+function initQuestions() {
+  inquirer
+    .prompt({
+      type: "list",
+      name: "decision",
+      message: "What would you like to do?",
+      choices: [
+        "View all Employees",
+        "Add Employee",
+        "Remove Employee",
+        "Update Employee Role",
+        "Update Employee Manager",
+        "Add Role",
+        "Remove Role",
+        "Exit",
+      ],
+    })
+    .then((res) => {
+      //Check For selection and Prompt user accordingly
+
+      //View All Employees
+      if (res.decision === "View all Employees") {
+        queryEmployees();
+      }
+      //Add Employee
+      else if (res.decision === "Add Employee") {
+        inquirer.prompt(addEmployeePrompt).then((res) => {
+          queryAddEmployee(res.first_name, res.last_name, res.role);
+        });
+      }
+      //Remove Employee
+      else if (res.decision === "Remove Employee") {
+        inquirer.prompt(removeEmployeePrompt).then((res) => {
+          //Take from the full name and split into first and last name
+          let nameArray = res.employee.split(" ");
+          let first_name = nameArray[0];
+          let last_name = nameArray[1];
+          queryRemoveEmployee(first_name, last_name);
+        });
+      }
+      //Update Employee Role
+      else if (res.decision === "Update Employee Role") {
+        inquirer.prompt(updateEmployeeRole).then((res) => {
+          let nameArray = res.employee.split(" ");
+          let first_name = nameArray[0];
+          let last_name = nameArray[1];
+          queryUpdateEmployeeRole(first_name, last_name, res.role);
+        });
+      }
+      //Add Role
+      else if (res.decision === "Add Role") {
+        inquirer.prompt(addRole).then((res) => {
+          queryAddRole(res.title, res.salary);
+        });
+      }
+      //Remove Role
+      else if (res.decision === "Remove Role") {
+        inquirer.prompt(removeRole).then((res) => {
+          queryRemoveRole(res.role);
+        });
+      }
+      //Exit
+      else if (res.decision === "Exit") {
+        connection.end();
+      }
+    });
+}
+initQuestions();
