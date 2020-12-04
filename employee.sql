@@ -18,22 +18,13 @@ CREATE TABLE roles (
  department_id INT,
  PRIMARY KEY(id)
 );
-CREATE TABLE department (
- id INT NOT NULL AUTO_INCREMENT,
- dp_name VARCHAR(30),
- PRIMARY KEY(id)
-);
 -- 
 -- Inserts
 -- 
 INSERT INTO employee (first_name, last_name, role_id)
-VALUES("Chris", "Lamb", 2),
- ("Andrew", "Lamb", 3),
- ("Brandon", "Rogers,", 3);
-INSERT INTO department (dp_name)
-VALUES("Human Resources"),
- ("Upper-Management"),
- ("Sales");
+VALUES("John", "Doe", 2),
+ ("Jane", "Doe", 3),
+ ("Rob", "Lowe", 3);
 INSERT INTO roles (title, salary, department_id)
 VALUES("Salesman", 50000, 3),
  ("Executive", 150000, 2),

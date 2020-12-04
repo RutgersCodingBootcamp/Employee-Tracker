@@ -129,6 +129,7 @@ function queryEmployees() {
     function (err, res) {
       if (err) throw err;
       console.table(res);
+      connection.end();
     }
   );
 }
@@ -145,7 +146,7 @@ function queryAddEmployee(empFirst, empLast, role) {
       "'));",
     function (err, res) {
       if (err) throw err;
-      console.log(query.sql);
+      console.log("Employee Added!");
     }
   );
 
@@ -162,7 +163,7 @@ function queryAddRole(empTitle, empSalary) {
     },
     function (err, res) {
       if (err) throw err;
-      console.log(query.sql);
+      console.log("Role Added!");
     }
   );
   connection.end();
@@ -178,7 +179,8 @@ function queryRemoveEmployee(first, last) {
       "'",
     function (err, res) {
       if (err) throw err;
-      console.log(query.sql);
+      console.log("Employee Removed!");
+      connection.end();
     }
   );
 }
@@ -188,7 +190,8 @@ function queryRemoveRole(role) {
     "DELETE FROM roles WHERE title='" + role + "';",
     function (err, res) {
       if (err) throw err;
-      console.log(query.sql);
+      console.log("Role Removed!");
+      connection.end();
     }
   );
 }
@@ -220,7 +223,6 @@ function initQuestions() {
         "Add Employee",
         "Remove Employee",
         "Update Employee Role",
-        "Update Employee Manager",
         "Add Role",
         "Remove Role",
         "Exit",
